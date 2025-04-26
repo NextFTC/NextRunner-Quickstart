@@ -1,16 +1,21 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.PoseVelocity2d;
-import com.acmerobotics.roadrunner.Rotation2d;
-import com.acmerobotics.roadrunner.Vector2d;
+import com.acmerobotics.roadrunner.ftc.Localizer;
 import com.acmerobotics.roadrunner.ftc.OTOSKt;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.PoseVelocity2d;
+import com.acmerobotics.roadrunner.geometry.Rotation2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
 
 @Config
 public class OTOSLocalizer implements Localizer {
@@ -26,6 +31,7 @@ public class OTOSLocalizer implements Localizer {
 
     public final SparkFunOTOS otos;
     private Pose2d currentPose;
+    private final ArrayDeque<Pose2d> poseHistory = new ArrayDeque<>();
 
     public OTOSLocalizer(HardwareMap hardwareMap, Pose2d initialPose) {
         // TODO: make sure your config has an OTOS device with this name
@@ -54,6 +60,11 @@ public class OTOSLocalizer implements Localizer {
     }
 
     @Override
+    public List<Pose2d> getPoseHistory() {
+        return new ArrayList<>(poseHistory);
+    }
+
+    @Override
     public PoseVelocity2d update() {
         SparkFunOTOS.Pose2D otosPose = new SparkFunOTOS.Pose2D();
         SparkFunOTOS.Pose2D otosVel = new SparkFunOTOS.Pose2D();
@@ -63,6 +74,13 @@ public class OTOSLocalizer implements Localizer {
         currentPose = OTOSKt.toRRPose(otosPose);
         Vector2d fieldVel = new Vector2d(otosVel.x, otosVel.y);
         Vector2d robotVel = Rotation2d.exp(otosPose.h).inverse().times(fieldVel);
+
+        poseHistory.addFirst(currentPose);
+
+        if (poseHistory.size() > 100) {
+            poseHistory.removeLast();
+        }
+
         return new PoseVelocity2d(robotVel, otosVel.h);
     }
 }

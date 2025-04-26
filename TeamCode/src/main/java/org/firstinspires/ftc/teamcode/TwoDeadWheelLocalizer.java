@@ -1,19 +1,20 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.DualNum;
-import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.PoseVelocity2d;
-import com.acmerobotics.roadrunner.Rotation2d;
-import com.acmerobotics.roadrunner.Time;
-import com.acmerobotics.roadrunner.Twist2dDual;
-import com.acmerobotics.roadrunner.Vector2d;
-import com.acmerobotics.roadrunner.Vector2dDual;
 import com.acmerobotics.roadrunner.ftc.Encoder;
 import com.acmerobotics.roadrunner.ftc.FlightRecorder;
+import com.acmerobotics.roadrunner.ftc.Localizer;
 import com.acmerobotics.roadrunner.ftc.OverflowEncoder;
 import com.acmerobotics.roadrunner.ftc.PositionVelocityPair;
 import com.acmerobotics.roadrunner.ftc.RawEncoder;
+import com.acmerobotics.roadrunner.geometry.DualNum;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.PoseVelocity2d;
+import com.acmerobotics.roadrunner.geometry.Rotation2d;
+import com.acmerobotics.roadrunner.geometry.Time;
+import com.acmerobotics.roadrunner.geometry.Twist2dDual;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.geometry.Vector2dDual;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -23,6 +24,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.messages.TwoDeadWheelInputsMessage;
+
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 
 @Config
 public final class TwoDeadWheelLocalizer implements Localizer {
@@ -44,6 +48,7 @@ public final class TwoDeadWheelLocalizer implements Localizer {
     private double lastRawHeadingVel, headingVelOffset;
     private boolean initialized;
     private Pose2d pose;
+    private final ArrayDeque<Pose2d> poseHistory = new ArrayDeque<>();
 
     public TwoDeadWheelLocalizer(HardwareMap hardwareMap, IMU imu, double inPerTick, Pose2d initialPose) {
         // TODO: make sure your config has **motors** with these names (or change them)
@@ -72,6 +77,11 @@ public final class TwoDeadWheelLocalizer implements Localizer {
     @Override
     public Pose2d getPose() {
         return pose;
+    }
+
+    @Override
+    public ArrayList<Pose2d> getPoseHistory() {
+        return new ArrayList<>(poseHistory);
     }
 
     @Override
@@ -138,6 +148,12 @@ public final class TwoDeadWheelLocalizer implements Localizer {
         lastHeading = heading;
 
         pose = pose.plus(twist.value());
+
+        poseHistory.addFirst(pose);
+        if (poseHistory.size() > 100) {
+            poseHistory.removeLast();
+        }
+
         return twist.velocity().value();
     }
 }

@@ -1,13 +1,16 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.PoseVelocity2d;
-import com.acmerobotics.roadrunner.Rotation2d;
-import com.acmerobotics.roadrunner.Vector2d;
-import com.acmerobotics.roadrunner.ftc.PinpointView;
+import com.acmerobotics.roadrunner.ftc.Localizer;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.PoseVelocity2d;
+import com.acmerobotics.roadrunner.geometry.Rotation2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Config
@@ -24,6 +27,8 @@ public final class PinpointLocalizer implements Localizer {
 
     private Pose2d txWorldPinpoint;
     private Pose2d txPinpointRobot = new Pose2d(0, 0, 0);
+    private Pose2d currentPose;
+    private final ArrayDeque<Pose2d> poseHistory = new ArrayDeque<>();
 
     public PinpointLocalizer(HardwareMap hardwareMap, double inPerTick, Pose2d initialPose) {
         // TODO: make sure your config has a Pinpoint device with this name
@@ -52,7 +57,12 @@ public final class PinpointLocalizer implements Localizer {
 
     @Override
     public Pose2d getPose() {
-        return txWorldPinpoint.times(txPinpointRobot);
+        return currentPose;
+    }
+
+    @Override
+    public List<Pose2d> getPoseHistory() {
+        return new ArrayList<>(poseHistory);
     }
 
     @Override
@@ -62,6 +72,14 @@ public final class PinpointLocalizer implements Localizer {
             txPinpointRobot = new Pose2d(driver.getPosX() / 25.4, driver.getPosY() / 25.4, driver.getHeading());
             Vector2d worldVelocity = new Vector2d(driver.getVelX() / 25.4, driver.getVelY() / 25.4);
             Vector2d robotVelocity = Rotation2d.fromDouble(-driver.getHeading()).times(worldVelocity);
+
+            currentPose = txWorldPinpoint.times(txPinpointRobot);
+            poseHistory.addFirst(currentPose);
+
+            if (poseHistory.size() > 100) {
+                poseHistory.removeLast();
+            }
+
             return new PoseVelocity2d(robotVelocity, driver.getHeadingVelocity());
         }
         return new PoseVelocity2d(new Vector2d(0, 0), 0);

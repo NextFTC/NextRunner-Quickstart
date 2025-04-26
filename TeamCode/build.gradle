@@ -24,6 +24,7 @@ android {
 }
 
 repositories {
+    mavenLocal()
     maven {
         url = 'https://maven.brott.dev/'
     }
@@ -32,8 +33,8 @@ repositories {
 dependencies {
     implementation project(':FtcRobotController')
 
-    implementation "com.acmerobotics.roadrunner:ftc:0.1.21"
-    implementation "com.acmerobotics.roadrunner:core:1.0.1"
-    implementation "com.acmerobotics.roadrunner:actions:1.0.1"
+    implementation "dev.nextftc.nextrunner:core:2b2"
+    implementation "dev.nextftc.nextrunner:actions:2b2"
+    implementation "dev.nextftc.nextrunner:ftc:2b2"
     implementation "com.acmerobotics.dashboard:dashboard:0.4.16"
 }
