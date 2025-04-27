@@ -43,12 +43,14 @@ import com.acmerobotics.roadrunner.profiles.MinVelConstraint;
 import com.acmerobotics.roadrunner.profiles.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.profiles.ProfileParams;
 import com.acmerobotics.roadrunner.profiles.VelConstraint;
+import com.acmerobotics.roadrunner.trajectories.TrajectoryBuilder;
 import com.acmerobotics.roadrunner.trajectories.TrajectoryBuilderParams;
 import com.acmerobotics.roadrunner.trajectories.TurnConstraints;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorImplEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -284,7 +286,7 @@ public final class MecanumDrive implements Drive {
         leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
         leftBack = hardwareMap.get(DcMotorEx.class, "leftBack");
         rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
-        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
+        rightFront = hardwareMap.get(DcMotorImplEx.class, "rightFront");
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -417,5 +419,23 @@ public final class MecanumDrive implements Drive {
     @Override
     public TrajectoryActionBuilder actionBuilder() {
         return actionBuilder(localizer.getPose());
+    }
+
+    @Override
+    public TrajectoryBuilder trajectoryBuilder(Pose2d beginPose) {
+        return new TrajectoryBuilder(
+                new TrajectoryBuilderParams(
+                        1e-6,
+                        followerParams.profileParams
+                ),
+                beginPose, 0.0,
+                defaultVelConstraint,
+                defaultAccelConstraint
+        );
+    }
+
+    @Override
+    public TrajectoryBuilder trajectoryBuilder() {
+        return trajectoryBuilder(localizer.getPose());
     }
 }

@@ -41,6 +41,7 @@ import com.acmerobotics.roadrunner.profiles.MinVelConstraint;
 import com.acmerobotics.roadrunner.profiles.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.profiles.ProfileParams;
 import com.acmerobotics.roadrunner.profiles.VelConstraint;
+import com.acmerobotics.roadrunner.trajectories.TrajectoryBuilder;
 import com.acmerobotics.roadrunner.trajectories.TrajectoryBuilderParams;
 import com.acmerobotics.roadrunner.trajectories.TurnConstraints;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -415,5 +416,23 @@ public final class TankDrive implements Drive {
     @Override
     public TrajectoryActionBuilder actionBuilder() {
         return actionBuilder(localizer.getPose());
+    }
+
+    @Override
+    public TrajectoryBuilder trajectoryBuilder(Pose2d beginPose) {
+        return new TrajectoryBuilder(
+                new TrajectoryBuilderParams(
+                        1e-6,
+                        followerParams.profileParams
+                ),
+                beginPose, 0.0,
+                defaultVelConstraint,
+                defaultAccelConstraint
+        );
+    }
+
+    @Override
+    public TrajectoryBuilder trajectoryBuilder() {
+        return trajectoryBuilder(localizer.getPose());
     }
 }
