@@ -26,7 +26,6 @@ import com.acmerobotics.roadrunner.ftc.PositionVelocityPair;
 import com.acmerobotics.roadrunner.ftc.RawEncoder;
 import com.acmerobotics.roadrunner.ftc.TankCommandMessage;
 import com.acmerobotics.roadrunner.ftc.TankLocalizerInputsMessage;
-import com.acmerobotics.roadrunner.ftc.TimeFollower;
 import com.acmerobotics.roadrunner.ftc.TurnAction;
 import com.acmerobotics.roadrunner.geometry.DualNum;
 import com.acmerobotics.roadrunner.geometry.Pose2d;

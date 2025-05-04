@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.examples;
 
 import com.acmerobotics.roadrunner.ftc.Follower;
-import com.acmerobotics.roadrunner.ftc.TimeFollower;
 import com.acmerobotics.roadrunner.geometry.Arclength;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
@@ -9,6 +8,7 @@ import com.acmerobotics.roadrunner.trajectories.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
+import org.firstinspires.ftc.teamcode.TimeFollower;
 
 public class FollowerExample extends OpMode {
     private MecanumDrive drive;
