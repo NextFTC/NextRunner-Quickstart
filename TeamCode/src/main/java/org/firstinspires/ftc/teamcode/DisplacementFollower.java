@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import static com.acmerobotics.roadrunner.geometry.Math.range;
 import static com.acmerobotics.roadrunner.profiles.Profiles.forwardProfile;
 
 import androidx.annotation.NonNull;
@@ -18,10 +19,8 @@ import com.acmerobotics.roadrunner.profiles.AccelConstraint;
 import com.acmerobotics.roadrunner.profiles.VelConstraint;
 import com.acmerobotics.roadrunner.trajectories.DisplacementTrajectory;
 import com.acmerobotics.roadrunner.trajectories.Trajectory;
-import static com.acmerobotics.roadrunner.geometry.Math.range;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class DisplacementFollower implements Follower {
