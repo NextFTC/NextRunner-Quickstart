@@ -25,12 +25,11 @@ android {
 
 repositories {
     maven {
-        url = 'https://maven.zharel.me/snapshots'
+        url = 'https://maven.zharel.me/releases'
     }
     maven {
         url = 'https://maven.brott.dev/'
     }
-    mavenLocal()
 }
 
 dependencies {
