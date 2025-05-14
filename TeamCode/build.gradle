@@ -30,16 +30,14 @@ repositories {
     maven {
         url = 'https://maven.brott.dev/'
     }
-    maven {
-        url = 'https://maven.zharel.me/snapshots/'
-    }
+    mavenLocal()
 }
 
 dependencies {
     implementation project(':FtcRobotController')
 
-    implementation "dev.nextftc.nextrunner:core:2.0.0-BETA-2"
-    implementation "dev.nextftc.nextrunner:actions:2.0.0-BETA-2"
-    implementation "dev.nextftc.nextrunner:ftc:2.0.0-BETA-2"
+    implementation "dev.nextftc.nextrunner:core:2.0.1"
+    implementation "dev.nextftc.nextrunner:actions:2.0.1"
+    implementation "dev.nextftc.nextrunner:ftc:2.0.1"
     implementation "com.acmerobotics.dashboard:dashboard:0.4.16"
 }
