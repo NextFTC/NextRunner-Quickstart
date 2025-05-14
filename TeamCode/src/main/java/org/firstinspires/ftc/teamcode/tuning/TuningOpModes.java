@@ -37,6 +37,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpModeManager;
 import com.qualcomm.robotcore.eventloop.opmode.OpModeRegistrar;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 import org.firstinspires.ftc.robotcore.internal.opmode.OpModeMeta;
 import org.firstinspires.ftc.teamcode.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
@@ -89,7 +90,7 @@ public final class TuningOpModes {
 
             @Override
             public float getHeadingVelocity() {
-                return (float) pl.driver.getHeadingVelocity();
+                return (float) pl.driver.getHeadingVelocity(UnnormalizedAngleUnit.RADIANS);
             }
 
             @Override
