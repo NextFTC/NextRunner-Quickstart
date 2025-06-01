@@ -35,8 +35,8 @@ repositories {
 dependencies {
     implementation project(':FtcRobotController')
 
-    implementation "dev.nextftc.nextrunner:core:2.0.1"
-    implementation "dev.nextftc.nextrunner:actions:2.0.1"
-    implementation "dev.nextftc.nextrunner:ftc:2.0.1"
+    implementation "dev.nextftc.nextrunner:core:2.1.0"
+    implementation "dev.nextftc.nextrunner:actions:2.1.0"
+    implementation "dev.nextftc.nextrunner:ftc:2.1.0"
     implementation "com.acmerobotics.dashboard:dashboard:0.4.16"
 }
