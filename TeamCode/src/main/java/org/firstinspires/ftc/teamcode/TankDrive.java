@@ -1,44 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
 import androidx.annotation.NonNull;
-
 import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.actions.TrajectoryActionBuilder;
-import com.acmerobotics.roadrunner.control.MotorFeedforward;
-import com.acmerobotics.roadrunner.control.RamseteController;
-import com.acmerobotics.roadrunner.control.RobotPosVelController;
-import com.acmerobotics.roadrunner.control.TankKinematics;
-import com.acmerobotics.roadrunner.control.WheelVelConstraint;
-import com.acmerobotics.roadrunner.ftc.DownsampledWriter;
-import com.acmerobotics.roadrunner.ftc.Drive;
-import com.acmerobotics.roadrunner.ftc.Encoder;
-import com.acmerobotics.roadrunner.ftc.FlightRecorder;
-import com.acmerobotics.roadrunner.ftc.FollowerParams;
-import com.acmerobotics.roadrunner.ftc.LazyHardwareMapImu;
-import com.acmerobotics.roadrunner.ftc.LazyImu;
-import com.acmerobotics.roadrunner.ftc.Localizer;
-import com.acmerobotics.roadrunner.ftc.LynxFirmware;
-import com.acmerobotics.roadrunner.ftc.OverflowEncoder;
-import com.acmerobotics.roadrunner.ftc.PoseMessage;
-import com.acmerobotics.roadrunner.ftc.PositionVelocityPair;
-import com.acmerobotics.roadrunner.ftc.RawEncoder;
-import com.acmerobotics.roadrunner.ftc.TankCommandMessage;
-import com.acmerobotics.roadrunner.ftc.TankLocalizerInputsMessage;
-import com.acmerobotics.roadrunner.ftc.TurnAction;
-import com.acmerobotics.roadrunner.geometry.DualNum;
-import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.PoseVelocity2d;
-import com.acmerobotics.roadrunner.geometry.PoseVelocity2dDual;
-import com.acmerobotics.roadrunner.geometry.Time;
-import com.acmerobotics.roadrunner.geometry.Twist2dDual;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
-import com.acmerobotics.roadrunner.profiles.AccelConstraint;
-import com.acmerobotics.roadrunner.profiles.AngularVelConstraint;
-import com.acmerobotics.roadrunner.profiles.MinVelConstraint;
-import com.acmerobotics.roadrunner.profiles.ProfileAccelConstraint;
-import com.acmerobotics.roadrunner.profiles.ProfileParams;
-import com.acmerobotics.roadrunner.profiles.VelConstraint;
+import com.acmerobotics.roadrunner.control.*;
+import com.acmerobotics.roadrunner.ftc.*;
+import com.acmerobotics.roadrunner.geometry.*;
+import com.acmerobotics.roadrunner.profiles.*;
 import com.acmerobotics.roadrunner.trajectories.TrajectoryBuilder;
 import com.acmerobotics.roadrunner.trajectories.TrajectoryBuilderParams;
 import com.acmerobotics.roadrunner.trajectories.TurnConstraints;
@@ -48,13 +16,10 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+import com.rowanmcalpin.nextftc.roadrunner.TrajectoryCommandBuilder;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.lang.Math;
+import java.util.*;
 
 @Config
 public final class TankDrive implements Drive {
@@ -391,18 +356,16 @@ public final class TankDrive implements Drive {
         c.strokePolyline(xPoints, yPoints);
     }
 
-    public TrajectoryActionBuilder actionBuilder(Pose2d beginPose) {
-        return new TrajectoryActionBuilder(
-                turn -> new TurnAction(turn, this),
-                traj -> new FollowTrajectoryAction(
+    public TrajectoryCommandBuilder commandBuilder(Pose2d beginPose) {
+        return new TrajectoryCommandBuilder(
+                turn -> new TurnCommand(turn, this),
+                traj -> new FollowTrajectoryCommand(
                         new TimeFollower(traj, this),
                         this
                 ),
                 new TrajectoryBuilderParams(
                         1e-6,
-                        new ProfileParams(
-                                0.25, 0.1, 1e-2
-                        )
+                        followerParams.profileParams
                 ),
                 beginPose, 0.0,
                 defaultTurnConstraints,
@@ -410,8 +373,8 @@ public final class TankDrive implements Drive {
         );
     }
 
-    public TrajectoryActionBuilder actionBuilder() {
-        return actionBuilder(localizer.getPose());
+    public TrajectoryCommandBuilder commandBuilder() {
+        return commandBuilder(localizer.getPose());
     }
 
     @Override

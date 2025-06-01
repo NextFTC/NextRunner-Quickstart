@@ -1,27 +1,31 @@
 package org.firstinspires.ftc.teamcode;
 
-import static com.acmerobotics.roadrunner.ftc.Drawing.drawRobot;
-
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.acmerobotics.roadrunner.actions.Action;
 import com.acmerobotics.roadrunner.ftc.Drawing;
 import com.acmerobotics.roadrunner.ftc.Drive;
 import com.acmerobotics.roadrunner.ftc.Follower;
 import com.acmerobotics.roadrunner.geometry.Geometry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.PoseVelocity2d;
 import com.acmerobotics.roadrunner.paths.PosePath;
 import com.acmerobotics.roadrunner.profiles.AccelConstraint;
 import com.acmerobotics.roadrunner.profiles.VelConstraint;
 import com.acmerobotics.roadrunner.trajectories.Trajectory;
+import com.rowanmcalpin.nextftc.core.command.Command;
 
-class FollowTrajectoryAction implements Action {
+import static com.acmerobotics.roadrunner.ftc.Drawing.drawRobot;
+
+class FollowTrajectoryCommand extends Command {
     private final Follower follower;
     private final Drive drive;
     private final double[] xPoints;
     private final double[] yPoints;
+    private final TelemetryPacket p = new TelemetryPacket();
 
-    public FollowTrajectoryAction(Follower follower, Drive drive) {
+
+    public FollowTrajectoryCommand(Follower follower, Drive drive) {
         this.follower = follower;
         this.drive = drive;
         Object[] xObjects = Geometry.xs(follower.getPoints()).toArray();
@@ -35,16 +39,16 @@ class FollowTrajectoryAction implements Action {
         }
     }
 
-    public FollowTrajectoryAction(Trajectory<?> traj, Drive drive) {
+    public FollowTrajectoryCommand(Trajectory<?> traj, Drive drive) {
         this(new DisplacementFollower(traj, drive), drive);
     }
 
-    public FollowTrajectoryAction(PosePath path, Drive drive, VelConstraint velConstraintOverride, AccelConstraint accelConstraintOverride) {
+    public FollowTrajectoryCommand(PosePath path, Drive drive, VelConstraint velConstraintOverride, AccelConstraint accelConstraintOverride) {
         this(new DisplacementFollower(path, drive, velConstraintOverride, accelConstraintOverride), drive);
     }
 
     @Override
-    public boolean run(TelemetryPacket p) {
+    public void update() {
         follower.follow();
 
         p.put("x", drive.getLocalizer().getPose().position.x);
@@ -56,7 +60,7 @@ class FollowTrajectoryAction implements Action {
         p.put("yError", error.position.y);
         p.put("headingError (deg)", Math.toDegrees(error.heading.toDouble()));
 
-        // only draw when active; only one drive action should be active at a time
+        // only draw when active; only one drive Command should be active at a time
         Canvas c = p.fieldOverlay();
         Drawing.drawPoseHistory(drive, c);
 
@@ -69,7 +73,16 @@ class FollowTrajectoryAction implements Action {
         c.setStroke("#4CAF50FF");
         c.setStrokeWidth(1);
         c.strokePolyline(xPoints, yPoints);
+    }
 
+    @Override
+    public void stop(boolean interrupted) {
+        drive.setDrivePowers(PoseVelocity2d.zero);
+        FtcDashboard.getInstance().sendTelemetryPacket(p);
+    }
+
+    @Override
+    public boolean isDone() {
         return follower.isDone();
     }
 }

@@ -1,61 +1,23 @@
 package org.firstinspires.ftc.teamcode;
 
 import androidx.annotation.NonNull;
-
 import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.actions.TrajectoryActionBuilder;
-import com.acmerobotics.roadrunner.control.HolonomicController;
-import com.acmerobotics.roadrunner.control.MecanumKinematics;
-import com.acmerobotics.roadrunner.control.MotorFeedforward;
-import com.acmerobotics.roadrunner.control.RobotPosVelController;
-import com.acmerobotics.roadrunner.control.WheelVelConstraint;
-import com.acmerobotics.roadrunner.ftc.DownsampledWriter;
-import com.acmerobotics.roadrunner.ftc.Drive;
-import com.acmerobotics.roadrunner.ftc.Encoder;
-import com.acmerobotics.roadrunner.ftc.FlightRecorder;
-import com.acmerobotics.roadrunner.ftc.FollowerParams;
-import com.acmerobotics.roadrunner.ftc.LazyHardwareMapImu;
-import com.acmerobotics.roadrunner.ftc.LazyImu;
-import com.acmerobotics.roadrunner.ftc.Localizer;
-import com.acmerobotics.roadrunner.ftc.LynxFirmware;
-import com.acmerobotics.roadrunner.ftc.MecanumCommandMessage;
-import com.acmerobotics.roadrunner.ftc.MecanumLocalizerInputsMessage;
-import com.acmerobotics.roadrunner.ftc.OverflowEncoder;
-import com.acmerobotics.roadrunner.ftc.PoseMessage;
-import com.acmerobotics.roadrunner.ftc.PositionVelocityPair;
-import com.acmerobotics.roadrunner.ftc.RawEncoder;
-import com.acmerobotics.roadrunner.ftc.TurnAction;
-import com.acmerobotics.roadrunner.geometry.DualNum;
-import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.PoseVelocity2d;
-import com.acmerobotics.roadrunner.geometry.PoseVelocity2dDual;
-import com.acmerobotics.roadrunner.geometry.Rotation2d;
-import com.acmerobotics.roadrunner.geometry.Time;
-import com.acmerobotics.roadrunner.geometry.Twist2d;
-import com.acmerobotics.roadrunner.geometry.Twist2dDual;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
-import com.acmerobotics.roadrunner.profiles.AccelConstraint;
-import com.acmerobotics.roadrunner.profiles.AngularVelConstraint;
-import com.acmerobotics.roadrunner.profiles.MinVelConstraint;
-import com.acmerobotics.roadrunner.profiles.ProfileAccelConstraint;
-import com.acmerobotics.roadrunner.profiles.ProfileParams;
-import com.acmerobotics.roadrunner.profiles.VelConstraint;
+import com.acmerobotics.roadrunner.control.*;
+import com.acmerobotics.roadrunner.ftc.*;
+import com.acmerobotics.roadrunner.geometry.*;
+import com.acmerobotics.roadrunner.profiles.*;
 import com.acmerobotics.roadrunner.trajectories.TrajectoryBuilder;
 import com.acmerobotics.roadrunner.trajectories.TrajectoryBuilderParams;
 import com.acmerobotics.roadrunner.trajectories.TurnConstraints;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorImplEx;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
-
+import com.qualcomm.robotcore.hardware.*;
+import com.rowanmcalpin.nextftc.roadrunner.TrajectoryCommandBuilder;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
+import java.lang.Math;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -396,10 +358,10 @@ public final class MecanumDrive implements Drive {
         c.strokePolyline(xPoints, yPoints);
     }
 
-    public TrajectoryActionBuilder actionBuilder(Pose2d beginPose) {
-        return new TrajectoryActionBuilder(
-                turn -> new TurnAction(turn, this),
-                traj -> new FollowTrajectoryAction(
+    public TrajectoryCommandBuilder commandBuilder(Pose2d beginPose) {
+        return new TrajectoryCommandBuilder(
+                turn -> new TurnCommand(turn, this),
+                traj -> new FollowTrajectoryCommand(
                         new TimeFollower(traj, this),
                         this
                 ),
@@ -413,8 +375,8 @@ public final class MecanumDrive implements Drive {
         );
     }
 
-    public TrajectoryActionBuilder actionBuilder() {
-        return actionBuilder(localizer.getPose());
+    public TrajectoryCommandBuilder commandBuilder() {
+        return commandBuilder(localizer.getPose());
     }
 
     @Override
