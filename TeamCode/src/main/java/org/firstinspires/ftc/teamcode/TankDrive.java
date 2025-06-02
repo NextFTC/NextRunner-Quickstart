@@ -113,20 +113,8 @@ public final class TankDrive implements Drive {
                     new AngularVelConstraint(PARAMS.maxAngVel)
             ));
 
-    @NonNull
-    @Override
-    public VelConstraint getDefaultVelConstraint() {
-        return defaultVelConstraint;
-    }
-
     public final AccelConstraint defaultAccelConstraint =
             new ProfileAccelConstraint(PARAMS.minProfileAccel, PARAMS.maxProfileAccel);
-
-    @NonNull
-    @Override
-    public AccelConstraint getDefaultAccelConstraint() {
-        return defaultAccelConstraint;
-    }
 
     private final RamseteController ramseteController = new RamseteController(kinematics.trackWidth, PARAMS.ramseteZeta, PARAMS.ramseteBBar);
 
@@ -425,10 +413,5 @@ public final class TankDrive implements Drive {
                 defaultVelConstraint,
                 defaultAccelConstraint
         );
-    }
-
-    @Override
-    public TrajectoryBuilder trajectoryBuilder() {
-        return trajectoryBuilder(localizer.getPose());
     }
 }
