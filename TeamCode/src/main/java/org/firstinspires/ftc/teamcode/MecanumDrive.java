@@ -84,20 +84,8 @@ public final class MecanumDrive implements Drive {
                     new AngularVelConstraint(PARAMS.maxAngVel)
             ));
 
-    @NonNull
-    @Override
-    public VelConstraint getDefaultVelConstraint() {
-        return defaultVelConstraint;
-    }
-
     public final AccelConstraint defaultAccelConstraint =
             new ProfileAccelConstraint(PARAMS.minProfileAccel, PARAMS.maxProfileAccel);
-
-    @NonNull
-    @Override
-    public AccelConstraint getDefaultAccelConstraint() {
-        return defaultAccelConstraint;
-    }
 
     public final FollowerParams followerParams = new FollowerParams(
             new ProfileParams(
