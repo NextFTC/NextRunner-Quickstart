@@ -35,6 +35,10 @@ repositories {
     maven {
         url = 'https://maven.brott.dev/'
     }
+    maven {
+        url = 'https://maven.rowanmcalpin.com/'
+    }
+    mavenLocal()
 }
 
 dependencies {
@@ -44,4 +48,7 @@ dependencies {
     implementation "dev.nextftc.nextrunner:actions:2.1.1"
     implementation "dev.nextftc.nextrunner:ftc:2.1.1"
     implementation "com.acmerobotics.dashboard:dashboard:0.4.16"
+    implementation 'com.rowanmcalpin.nextftc:core:0.7.0'
+    implementation 'com.rowanmcalpin.nextftc:ftc:0.7.0'
+    implementation 'com.rowanmcalpin.nextftc:roadrunner:0.0.0-test1'
 }

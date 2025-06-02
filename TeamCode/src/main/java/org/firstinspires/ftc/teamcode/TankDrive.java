@@ -16,13 +16,15 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+import com.rowanmcalpin.nextftc.core.Subsystem;
+import com.rowanmcalpin.nextftc.ftc.OpModeData;
 import com.rowanmcalpin.nextftc.roadrunner.TrajectoryCommandBuilder;
 
 import java.lang.Math;
 import java.util.*;
 
 @Config
-public final class TankDrive implements Drive {
+public final class TankDrive extends Subsystem implements Drive {
     public static class Params {
         // IMU orientation
         // TODO: fill in these values based on
@@ -58,6 +60,8 @@ public final class TankDrive implements Drive {
         public double turnGain = 0.0;
         public double turnVelGain = 0.0;
     }
+    public static final TankDrive INSTANCE = new TankDrive();
+    private TankDrive() {}
 
     public static Params PARAMS = new Params();
 
@@ -102,13 +106,13 @@ public final class TankDrive implements Drive {
         return followerParams;
     }
 
-    public final List<DcMotorEx> leftMotors, rightMotors;
+    public List<DcMotorEx> leftMotors, rightMotors;
 
-    public final LazyImu lazyImu;
+    public LazyImu lazyImu;
 
-    public final VoltageSensor voltageSensor;
+    public VoltageSensor voltageSensor;
 
-    public final Localizer localizer;
+    public Localizer localizer;
     private final LinkedList<Pose2d> poseHistory = new LinkedList<>();
 
     private final DownsampledWriter estimatedPoseWriter = new DownsampledWriter("ESTIMATED_POSE", 50_000_000);
@@ -228,7 +232,11 @@ public final class TankDrive implements Drive {
         }
     }
 
-    public TankDrive(HardwareMap hardwareMap, Pose2d pose) {
+    public void initialize() {
+        HardwareMap hardwareMap = OpModeData.hardwareMap;
+
+        assert hardwareMap != null;
+
         LynxFirmware.throwIfModulesAreOutdated(hardwareMap);
 
         for (LynxModule module : hardwareMap.getAll(LynxModule.class)) {
@@ -258,7 +266,7 @@ public final class TankDrive implements Drive {
 
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
 
-        localizer = new DriveLocalizer(pose);
+        localizer = new DriveLocalizer(Pose2d.zero);
 
         FlightRecorder.write("TANK_PARAMS", PARAMS);
     }

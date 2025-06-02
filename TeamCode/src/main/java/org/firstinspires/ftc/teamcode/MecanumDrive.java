@@ -13,6 +13,8 @@ import com.acmerobotics.roadrunner.trajectories.TurnConstraints;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.*;
+import com.rowanmcalpin.nextftc.core.Subsystem;
+import com.rowanmcalpin.nextftc.ftc.OpModeData;
 import com.rowanmcalpin.nextftc.roadrunner.TrajectoryCommandBuilder;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
@@ -24,7 +26,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 
 @Config
-public final class MecanumDrive implements Drive {
+public final class MecanumDrive extends Subsystem implements Drive {
     public static class Params {
         // IMU orientation
         // TODO: fill in these values based on
@@ -63,7 +65,8 @@ public final class MecanumDrive implements Drive {
         public double headingVelGain = 0.0; // shared with turn
     }
 
-    public static Params PARAMS = new Params();
+    public static final Params PARAMS = new Params();
+    public static MecanumDrive INSTANCE = new MecanumDrive();
 
     public final MecanumKinematics kinematics = new MecanumKinematics(
             PARAMS.inPerTick * PARAMS.trackWidthTicks, PARAMS.inPerTick / PARAMS.lateralInPerTick);
@@ -100,14 +103,17 @@ public final class MecanumDrive implements Drive {
         return followerParams;
     }
 
-    public final DcMotorEx leftFront, leftBack, rightBack, rightFront;
+    public DcMotorEx leftFront;
+    public DcMotorEx leftBack;
+    public DcMotorEx rightBack;
+    public DcMotorEx rightFront;
 
-    public final VoltageSensor voltageSensor;
+    public VoltageSensor voltageSensor;
 
-    public final LazyImu lazyImu;
+    public LazyImu lazyImu;
 
-    public final Localizer localizer;
-    public final HolonomicController controller;
+    public Localizer localizer;
+    public HolonomicController controller;
     private final LinkedList<Pose2d> poseHistory = new LinkedList<>();
 
     private final DownsampledWriter estimatedPoseWriter = new DownsampledWriter("ESTIMATED_POSE", 50_000_000);
@@ -222,7 +228,12 @@ public final class MecanumDrive implements Drive {
         }
     }
 
-    public MecanumDrive(HardwareMap hardwareMap, Pose2d pose) {
+    @Override
+    public void initialize() {
+        HardwareMap hardwareMap = OpModeData.hardwareMap;
+
+        assert hardwareMap != null;
+
         LynxFirmware.throwIfModulesAreOutdated(hardwareMap);
 
         for (LynxModule module : hardwareMap.getAll(LynxModule.class)) {
@@ -251,13 +262,18 @@ public final class MecanumDrive implements Drive {
 
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
 
-        localizer = new DriveLocalizer(pose);
+        localizer = new DriveLocalizer(Pose2d.zero);
         controller = new HolonomicController(
                 PARAMS.axialGain, PARAMS.lateralGain, PARAMS.headingGain,
                 PARAMS.axialVelGain, PARAMS.lateralVelGain, PARAMS.headingVelGain
         );
 
         FlightRecorder.write("MECANUM_PARAMS", PARAMS);
+    }
+
+    public MecanumDrive setPose(Pose2d pose) {
+        localizer.setPose(pose);
+        return this;
     }
 
     @Override
