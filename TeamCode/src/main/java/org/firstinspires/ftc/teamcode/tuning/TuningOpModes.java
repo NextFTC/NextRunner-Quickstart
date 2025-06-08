@@ -132,7 +132,9 @@ public final class TuningOpModes {
         DriveViewFactory dvf;
         if (DRIVE_CLASS.equals(MecanumDrive.class)) {
             dvf = hardwareMap -> {
-                MecanumDrive md = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
+                MecanumDrive md = MecanumDrive.INSTANCE;
+                md.initialize(hardwareMap);
+
                 LazyImu lazyImu = md.lazyImu;
 
                 List<EncoderGroup> encoderGroups = new ArrayList<>();
@@ -210,7 +212,9 @@ public final class TuningOpModes {
             };
         } else if (DRIVE_CLASS.equals(TankDrive.class)) {
             dvf = hardwareMap -> {
-                TankDrive td = new TankDrive(hardwareMap, new Pose2d(0, 0, 0));
+                TankDrive td = TankDrive.INSTANCE;
+                td.initialize(hardwareMap);
+
                 LazyImu lazyImu = td.lazyImu;
 
                 List<EncoderGroup> encoderGroups = new ArrayList<>();
