@@ -232,9 +232,7 @@ public final class TankDrive extends Subsystem implements Drive {
         }
     }
 
-    public void initialize() {
-        HardwareMap hardwareMap = OpModeData.hardwareMap;
-
+    public void initialize(HardwareMap hardwareMap) {
         assert hardwareMap != null;
 
         LynxFirmware.throwIfModulesAreOutdated(hardwareMap);
@@ -269,6 +267,11 @@ public final class TankDrive extends Subsystem implements Drive {
         localizer = new DriveLocalizer(Pose2d.zero);
 
         FlightRecorder.write("TANK_PARAMS", PARAMS);
+    }
+
+    @Override
+    public void initialize() {
+        initialize(OpModeData.hardwareMap);
     }
 
     @Override

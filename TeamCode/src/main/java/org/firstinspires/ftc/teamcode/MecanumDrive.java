@@ -228,10 +228,7 @@ public final class MecanumDrive extends Subsystem implements Drive {
         }
     }
 
-    @Override
-    public void initialize() {
-        HardwareMap hardwareMap = OpModeData.hardwareMap;
-
+    public void initialize(HardwareMap hardwareMap) {
         assert hardwareMap != null;
 
         LynxFirmware.throwIfModulesAreOutdated(hardwareMap);
@@ -269,6 +266,11 @@ public final class MecanumDrive extends Subsystem implements Drive {
         );
 
         FlightRecorder.write("MECANUM_PARAMS", PARAMS);
+    }
+
+    @Override
+    public void initialize() {
+        initialize(OpModeData.hardwareMap);
     }
 
     public MecanumDrive setPose(Pose2d pose) {
