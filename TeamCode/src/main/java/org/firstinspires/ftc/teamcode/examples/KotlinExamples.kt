@@ -6,11 +6,15 @@ import com.acmerobotics.roadrunner.ftc.runBlocking
 import com.acmerobotics.roadrunner.geometry.Arclength
 import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.acmerobotics.roadrunner.geometry.Vector2d
+import com.acmerobotics.roadrunner.paths.Line
+import com.acmerobotics.roadrunner.paths.PosePath
+import com.acmerobotics.roadrunner.paths.fromPoints
 import com.acmerobotics.roadrunner.trajectories.Trajectory
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import com.qualcomm.robotcore.eventloop.opmode.Disabled
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.eventloop.opmode.OpMode
+import org.firstinspires.ftc.teamcode.DisplacementFollower
 import org.firstinspires.ftc.teamcode.MecanumDrive
 import org.firstinspires.ftc.teamcode.TimeFollower
 
@@ -52,6 +56,38 @@ class FollowerExampleKt: OpMode() {
             .buildToComposite()
 
         follower = TimeFollower(traj, drive)
+    }
+
+    override fun loop() {
+        if (!follower.isDone) {
+            follower.follow()
+        }
+    }
+}
+
+@Autonomous
+@Disabled
+class PathObjectsExampleKt : OpMode() {
+    private lateinit var drive: MecanumDrive
+    private lateinit var follower: Follower
+
+    override fun init() {
+        drive = MecanumDrive(hardwareMap, Pose2d(0.0, 0.0, 0.0))
+
+        val path1: PosePath = Line(
+            Vector2d(0.0, 0.0),
+            Vector2d(10.0, 10.0)
+        ).withTangentHeading()
+
+        val path2: PosePath = fromPoints(
+            Vector2d(10.0, 10.0),
+            Vector2d(20.0, 20.0),
+            Vector2d(10.0, 10.0)
+        ).withLinearHeading(Math.PI / 4, 0.0)
+
+        val trajectory = drive.createTrajectory(path1.plus(path2))
+
+        follower = DisplacementFollower(trajectory, drive)
     }
 
     override fun loop() {
